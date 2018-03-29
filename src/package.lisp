@@ -2,15 +2,15 @@
   (:use
     #:cl)
   (:export
-    ip-address
-    ip-version
     ipv4-address
     ipv6-address
-    ip-interface
-    ipv4-interface
-    ipv6-interface
-    address
-    prefixlength
+    ip-version
     as-string
     as-integer
+    ipv4-interface
+    ipv6-interface
+    ipv4-subnet
+    ipv6-subnet
+    address
+    prefixlength
     subnetp))

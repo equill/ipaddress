@@ -1,5 +1,8 @@
 (in-package :ipaddress)
 
+
+;;; Address objects
+
 (defclass ipv6-address (ip-address)
   ())
 
@@ -7,22 +10,28 @@
   6)
 
 ;; Sanity checks
+(defmethod check-address-values ((addr ipv6-address))
+  (cond
+    ;; No value for either representation of an address
+    ((and (not (slot-value addr 'str))
+          (not (slot-value addr 'int)))
+     (error "Either a string or integer representation of the address must be supplied."))
+    ;; Integer value is provided, but not a string representation
+    ((and (not (slot-value addr 'str))
+          (slot-value addr 'int))
+     (if (or (< (slot-value addr 'int) 0)
+             (> (slot-value addr 'int) 340282366920938463463374607431768211455))
+         (error "Integer value is out of range")))
+    ;; String representation is provided - we don't care whether an integer one was.
+    (t
+     (setf (slot-value addr 'int) (cl-cidr-notation:parse-ipv6 (slot-value addr 'str)))))
+  ;; Now canonicalise the string representation from the integer version
+  (setf (slot-value addr 'str)
+        (cl-cidr-notation:ipv6-string (slot-value addr 'int))))
+
 (defmethod initialize-instance :after ((addr ipv6-address) &key)
   ;; If a string representation was specified, check it
-  (if (slot-value addr 'str)
-      (let ((int-value (cl-cidr-notation:parse-ipv6 (slot-value addr 'str))))
-        ;; If it passed the sanity check, don't waste that work.
-        ;; Set the integer value to the generated integer value.
-        (setf (slot-value addr 'int) int-value))
-      ;; If it wasn't, but an integer representation was, check that
-      (if (slot-value addr 'int)
-          (if (or (< (slot-value addr 'int) 0)
-340282366920938463463374607431768211455
-                  (> (slot-value addr 'int) ))
-              (error "Integer value is out of range"))))
-  ;; If neither was supplied, this object isn't much use
-  (if (and (not (slot-value addr 'str)) (not (slot-value addr 'int)))
-      (error "Either a string or integer representation of the address must be supplied.")))
+  (check-address-values addr))
 
 ;; Memoised calculation
 (defmethod as-string ((addr ipv6-address))
@@ -32,6 +41,27 @@
           (cl-cidr-notation:ipv6-string (slot-value addr 'int))))
   (slot-value addr 'str))
 
-;; No need to calculate this; one way or another, it was set at initialisation.
-(defmethod as-integer ((addr ipv6-address))
-  (slot-value addr 'int))
+
+;;; Interface objects
+
+;;; These represent the addresses configured on an interface,
+;;; and thus have a prefix-length in addition to the address,
+;;; so the OS can infer the subnet to which the address belongs
+
+(defclass ipv6-interface (ipv6-address)
+  ((prefix-length
+     :initarg :prefix-length
+     :initform (error ":prefix-length argument must be specified."))))
+
+;; Sanity checks
+(defmethod check-prefix-length ((addr ipv6-address))
+  (when (or (not (integerp (slot-value addr 'prefix-length)))
+            (< (slot-value addr 'prefix-length) 0)
+            (> (slot-value addr 'prefix-length) 128))
+    (error "prefix-length must be an integer between 0 and 128")))
+
+(defmethod initialize-instance :after ((iface ipv6-interface) &key )
+  ;; Check the rest of the requirements for an address
+  (check-address-values iface)
+  ;; Ensure the prefix-length is within the permitted bounds
+  (check-prefix-length iface))
