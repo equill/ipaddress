@@ -7,4 +7,5 @@
                #:cl-cidr-notation)
   :components ((:file "package")
                (:file "generics")
-               (:file "ipv4")))
+               (:file "ipv4")
+               (:file "ipv6")))
