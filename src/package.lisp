@@ -7,10 +7,19 @@
     ip-version
     as-string
     as-integer
+    as-cidr
     ipv4-interface
     ipv6-interface
+    prefix-length
     ipv4-subnet
     ipv6-subnet
     address
-    prefixlength
-    subnetp))
+    prefix-length
+    subnetp
+    ipv4-subnet-p
+    make-ipv4-address
+    make-ipv4-interface
+    make-ipv4-subnet
+    make-ipv6-address
+    make-ipv6-interface
+    make-ipv6-subnet))

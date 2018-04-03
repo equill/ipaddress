@@ -8,4 +8,5 @@
   :components ((:file "package")
                (:file "generics")
                (:file "ipv4")
-               (:file "ipv6")))
+               (:file "ipv6")
+               (:file "utilities")))

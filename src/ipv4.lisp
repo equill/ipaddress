@@ -24,14 +24,16 @@
          (error "Integer value is out of range")))
     ;; String representation is provided - we don't care whether an integer one was.
     (t
-     (setf (slot-value addr 'int) (cl-cidr-notation:parse-ip (slot-value addr 'str)))))
+     (setf (slot-value addr 'int)
+           (cl-cidr-notation:parse-ip (slot-value addr 'str)))))
   ;; Now canonicalise the string representation from the integer version
   (setf (slot-value addr 'str)
         (cl-cidr-notation:ip-string (slot-value addr 'int))))
 
-(defmethod initialize-instance :after ((addr ipv4-address) &key)
-  ;; If a string representation was specified, check it
-  (check-address-values addr))
+;; From a certain POV, an address is simply a /32 subnet.
+;; It certainly makes some operations simpler.
+(defmethod prefix-length ((addr ipv4-address))
+  32)
 
 ;; Memoised calculation
 (defmethod as-string ((addr ipv4-address))
@@ -42,19 +44,17 @@
   (slot-value addr 'str))
 
 
-;;; Interface objects
-
-;;; These represent the addresses configured on an interface,
-;;; and thus have a prefix-length in addition to the address,
-;;; so the OS can infer the subnet to which the address belongs
+;;; Interfaces
 
 (defclass ipv4-interface (ipv4-address)
   ((prefix-length
+     :reader prefix-length
      :initarg :prefix-length
-     :initform (error ":prefix-length argument must be specified."))))
+     :initform (error ":prefix-length argument must be specified.")))
+  (:documentation "These represent the addresses configured on an interface, and thus have a prefix-length in addition to the address, so the OS can infer the subnet to which the address belongs."))
 
 ;; Sanity checks
-(defmethod check-prefix-length ((addr ipv6-address))
+(defmethod check-prefix-length ((addr ipv4-address))
   (when (or (not (integerp (slot-value addr 'prefix-length)))
             (< (slot-value addr 'prefix-length) 0)
             (> (slot-value addr 'prefix-length) 32))
@@ -65,3 +65,23 @@
   (check-address-values iface)
   ;; Ensure the prefix-length is within the permitted bounds
   (check-prefix-length iface))
+
+
+;;; Subnets
+
+(defclass ipv4-subnet (ipv4-interface)
+  ()
+  (:documentation "These represent actual networks, so have a prefix-length and a network address."))
+
+;; Sanity checks
+(defmethod initialize-instance :after ((subnet ipv4-subnet) &key )
+  ;; Check the rest of the requirements for an address
+  (check-address-values subnet)
+  ;; Ensure the prefix-length is within the permitted bounds
+  (check-prefix-length subnet)
+  ;; Check whether the address is a valid network address for this prefix length
+  (unless
+    (cl-cidr-notation:valid-cidr?
+      (slot-value subnet 'int)
+      (slot-value subnet 'prefix-length))
+    (error ":address value is not a valid network address")))
