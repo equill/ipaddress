@@ -46,12 +46,8 @@
 
 ;;; Interfaces
 
-(defclass ipv4-interface (ipv4-address)
-  ((prefix-length
-     :reader prefix-length
-     :initarg :prefix-length
-     :initform (error ":prefix-length argument must be specified.")))
-  (:documentation "These represent the addresses configured on an interface, and thus have a prefix-length in addition to the address, so the OS can infer the subnet to which the address belongs."))
+(defclass ipv4-interface (ip-interface ipv4-address)
+  ())
 
 ;; Sanity checks
 (defmethod check-prefix-length ((addr ipv4-address))
@@ -69,16 +65,11 @@
 
 ;;; Subnets
 
-(defclass ipv4-subnet (ipv4-interface)
-  ()
-  (:documentation "These represent actual networks, so have a prefix-length and a network address."))
+(defclass ipv4-subnet (ip-subnet ipv4-interface)
+  ())
 
 ;; Sanity checks
 (defmethod initialize-instance :after ((subnet ipv4-subnet) &key )
-  ;; Check the rest of the requirements for an address
-  (check-address-values subnet)
-  ;; Ensure the prefix-length is within the permitted bounds
-  (check-prefix-length subnet)
   ;; Check whether the address is a valid network address for this prefix length
   (unless
     (cl-cidr-notation:valid-cidr?

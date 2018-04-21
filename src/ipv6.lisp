@@ -45,12 +45,8 @@
 
 ;;; Interfaces
 
-(defclass ipv6-interface (ipv6-address)
-  ((prefix-length
-     :reader prefix-length
-     :initarg :prefix-length
-     :initform (error ":prefix-length argument must be specified.")))
-  (:documentation "These represent the addresses configured on an interface, and thus have a prefix-length in addition to the address, so the OS can infer the subnet to which the address belongs."))
+(defclass ipv6-interface (ip-interface ipv6-address)
+  ())
 
 ;; Sanity checks
 (defmethod check-prefix-length ((addr ipv6-address))
@@ -59,23 +55,13 @@
             (> (slot-value addr 'prefix-length) 128))
     (error "prefix-length must be an integer between 0 and 128")))
 
-(defmethod initialize-instance :after ((iface ipv6-interface) &key )
-  ;; Check the rest of the requirements for an address
-  (check-address-values iface)
-  ;; Ensure the prefix-length is within the permitted bounds
-  (check-prefix-length iface))
-
 
 ;;; Subnets
 
-(defclass ipv6-subnet (ipv6-interface)
-  ()
-  (:documentation "These represent actual networks, so have a prefix-length and a network address."))
+(defclass ipv6-subnet (ip-subnet ipv6-interface)
+  ())
 
 ;; Sanity checks
-;; FIXME: add a check to test that it's an actual network address
 (defmethod initialize-instance :after ((subnet ipv6-subnet) &key )
-  ;; Check the rest of the requirements for an address
-  (check-address-values subnet)
-  ;; Ensure the prefix-length is within the permitted bounds
+  ;; FIXME: add a check to test that it's an actual network address
   (check-prefix-length subnet))
