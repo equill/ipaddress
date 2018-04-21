@@ -58,4 +58,4 @@
                (princ (prefix-length addr) str)))
 
 (defgeneric subnetp (ip-entity supernet)
-  (:documentation "Return a boolean indicating whether the supplied entity is a subnet of the supernet. Treats IPv4 addresses as /32 subnets, and IPv6 addresses as /128 subnets."))
+  (:documentation "Return a boolean indicating whether the first supplied entity is a subnet of the second."))

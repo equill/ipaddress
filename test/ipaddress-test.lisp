@@ -199,6 +199,38 @@
 ;;; Utilities
 
 (fiveam:test
+  subnetp-ipv4
+  "IPv4 subnet comparisons"
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv4-address "127.0.0.1")
+               (ipaddress:make-ipv4-subnet "127.0.0.0/16")))
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv4-address "127.0.0.1")
+               (ipaddress:make-ipv4-interface "127.0.0.1/24")))
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv4-subnet "127.0.0.0/24")
+               (ipaddress:make-ipv4-subnet "127.0.0.0/16")))
+  (fiveam:is (not (ipaddress:subnetp
+                    (ipaddress:make-ipv4-subnet "127.0.0.0/16")
+                    (ipaddress:make-ipv4-subnet "127.0.0.0/24")))))
+
+(fiveam:test
+  subnetp-ipv6
+  "IPv6 subnet comparisons"
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv6-address "cafe:beef::1")
+               (ipaddress:make-ipv6-subnet "cafe:beef::/64")))
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv6-address "cafe:beef::1")
+               (ipaddress:make-ipv6-interface "cafe:beef::1/64")))
+  (fiveam:is (ipaddress:subnetp
+               (ipaddress:make-ipv6-subnet "cafe:beef::/64")
+               (ipaddress:make-ipv6-subnet "cafe:beef::/48")))
+  (fiveam:is (not (ipaddress:subnetp
+                    (ipaddress:make-ipv6-subnet "cafe:beef::/48")
+                    (ipaddress:make-ipv6-subnet "cafe:beef::/64")))))
+
+(fiveam:test
   ipv4-conveniences
   "Convenience IPv4 functions"
   ;; Address

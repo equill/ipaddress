@@ -63,3 +63,36 @@
       'ipv6-subnet
       :integer (cl-cidr-notation:parse-ipv6 addr)
       :prefix-length (parse-integer prefixlength :junk-allowed nil))))
+
+(defun compare-addresses (addr1 addr2 pos finish)
+  "Compare two addresses bitwise. Mostly intended for subnet checking.
+   Both addresses are expected in integer form."
+  (if (> pos finish)
+      ;; If we've checked each of the bits in question, we're good.
+      t
+      ;; Check the current bit
+      (if (= (ldb (byte 1 pos) addr1)
+             (ldb (byte 1 pos) addr2))
+          ;; If this bit matches, check the next one
+          (compare-addresses addr1 addr2 (+ pos 1) finish)
+          ;; If it doesn't match, we have our result.
+          nil)))
+
+(defmethod subnetp ((ip-entity ip-address) (supernet ip-subnet))
+  (if
+     ;; Sanity check: is the subnet's prefix-length shorter than the supernet's?
+     (<= (prefix-length ip-entity) (prefix-length supernet))
+     ;; If so, we already have our answer
+     nil
+     ;; Passed that test. Now actually compare them.
+     ;; Now compare each bit from least- to most-significant, over the length of the
+     ;; candidate parent's prefix.
+     (compare-addresses (as-integer ip-entity)
+                        (as-integer supernet)
+                        (- (if (equal (ip-version ip-entity) 4)
+                               32
+                               128)
+                           (prefix-length supernet))
+                        (if (equal (ip-version ip-entity) 4)
+                            31
+                            127))))
