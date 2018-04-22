@@ -1,5 +1,11 @@
 (in-package :ipaddress)
 
+(defun ipv4-address-p (address)
+  "Determine whether the supplied string is plausibly an IPv4 address in dotted-quad notation."
+  (cl-ppcre:all-matches
+    "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
+    address))
+
 (defun ipv4-subnet-p (subnet)
   "Determine whether the supplied string is a CIDR-formatted IPv4 subnet"
   (cl-ppcre:all-matches

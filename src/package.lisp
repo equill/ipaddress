@@ -19,6 +19,7 @@
     address
     prefix-length
     subnetp
+    ipv4-address-p
     ipv4-subnet-p
     make-ipv4-address
     make-ipv4-interface
