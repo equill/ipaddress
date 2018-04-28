@@ -1,16 +1,22 @@
 (in-package :ipaddress)
 
 (defun ipv4-address-p (address)
-  "Determine whether the supplied string is plausibly an IPv4 address in dotted-quad notation."
-  (cl-ppcre:all-matches
-    "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
-    address))
+  "Determine whether the supplied string is plausibly an IPv4 address in dotted-quad notation.
+   Return a boolean"
+  (when
+    (cl-ppcre:all-matches
+      "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
+      address)
+    t))
 
 (defun ipv4-subnet-p (subnet)
-  "Determine whether the supplied string is a CIDR-formatted IPv4 subnet"
-  (cl-ppcre:all-matches
-    "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\/[0-9]{1,2}"
-    subnet))
+  "Determine whether the supplied string is a CIDR-formatted IPv4 subnet.
+   Return a boolean"
+  (when
+    (cl-ppcre:all-matches
+      "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\/[0-9]{1,2}"
+      subnet)
+    t))
 
 (defun make-ipv4-address (addr)
   "Take a string representation of an address and return an object."
