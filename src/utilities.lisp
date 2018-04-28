@@ -51,30 +51,27 @@
 
 (defun make-ipv6-interface (cidrstr)
   "Convert a CIDR representation of an IPv6 interface, e.g. cafe:beef::1/64
-   into an ipv6-interface object.
-   If just given an address, e.g. cafe:beef::1it will auto-assign
-   a prefix-length of 128."
-  (let* ((slash (position #\/ cidrstr))
-         (prefixlength (subseq cidrstr (+ slash 1)))
-         (addr (subseq cidrstr 0 slash)))
+  into an ipv6-interface object.
+  If just given an address, e.g. cafe:beef::1it will auto-assign
+  a prefix-length of 128."
+  (multiple-value-bind (addr prefixlength)
+    (cl-cidr-notation:parse-ipv6-cidr cidrstr)
     (make-instance
       'ipv6-interface
-      :integer (cl-cidr-notation:parse-ipv6 addr)
-      :prefix-length
-      (if prefixlength
-          (parse-integer prefixlength :junk-allowed nil)
-          128))))
+      ;; Defer the work of converting this to a string until/unless required
+      :integer addr
+      :prefix-length prefixlength)))
 
 (defun make-ipv6-subnet (cidrstr)
   "Convert a CIDR representation of an IPv6 subnet, e.g. cafe:beef::/64
    into an ipv6-subnet object."
-  (let* ((slash (position #\/ cidrstr))
-         (prefixlength (subseq cidrstr (+ slash 1)))
-         (addr (subseq cidrstr 0 slash)))
+  (multiple-value-bind (addr prefixlength)
+    (cl-cidr-notation:parse-ipv6-cidr cidrstr)
     (make-instance
       'ipv6-subnet
-      :integer (cl-cidr-notation:parse-ipv6 addr)
-      :prefix-length (parse-integer prefixlength :junk-allowed nil))))
+      ;; Defer the work of converting this to a string until/unless required
+      :integer addr
+      :prefix-length prefixlength)))
 
 (defun compare-addresses (addr1 addr2 pos finish)
   "Compare two addresses bitwise. Mostly intended for subnet checking.
