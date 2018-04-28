@@ -76,13 +76,13 @@
                'ipaddress:ipv6-address
                :address "cafe:beef::1"))))
   (fiveam:is
-    (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0001"
+    (equal "cafe:beef:0000:0000:0000:0000:0000:0001"
            (ipaddress:as-string
              (make-instance
                'ipaddress:ipv6-address
                :address "cafe:beef::1"))))
   (fiveam:is
-    (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0001/128"
+    (equal "cafe:beef:0000:0000:0000:0000:0000:0001/128"
            (ipaddress:as-cidr
              (make-instance
                'ipaddress:ipv6-address
@@ -174,7 +174,7 @@
   render-ipv6-subnet
   "Rendering of an IPv6 subnet in various forms."
   (fiveam:is
-    (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0000"
+    (equal "cafe:beef:0000:0000:0000:0000:0000:0000"
            (ipaddress:as-string
              (make-instance
                'ipaddress:ipv6-subnet
@@ -188,7 +188,7 @@
                :address "cafe:beef::"
                :prefix-length 64))))
   (fiveam:is
-    (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0000/64"
+    (equal "cafe:beef:0000:0000:0000:0000:0000:0000/64"
            (ipaddress:as-cidr
              (make-instance
                'ipaddress:ipv6-subnet
@@ -271,7 +271,7 @@
                :address "cafe:beef::22"
                :prefix-length 64))
         (bar (ipaddress:make-ipv6-interface "cafe:beef::22/64")))
-    (fiveam:is (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0022/64" (ipaddress:as-cidr bar)))
+    (fiveam:is (equal "cafe:beef:0000:0000:0000:0000:0000:0022/64" (ipaddress:as-cidr bar)))
     (fiveam:is (equal (ipaddress:as-string foo) (ipaddress:as-string bar)))
     (fiveam:is (equal (ipaddress:prefix-length foo) (ipaddress:prefix-length bar))))
   ;; Subnet
@@ -280,6 +280,6 @@
                :address "cafe:beef::22"
                :prefix-length 64))
         (bar (ipaddress:make-ipv6-interface "cafe:beef::22/64")))
-    (fiveam:is (equal "CAFE:BEEF:0000:0000:0000:0000:0000:0022/64" (ipaddress:as-cidr bar)))
+    (fiveam:is (equal "cafe:beef:0000:0000:0000:0000:0000:0022/64" (ipaddress:as-cidr bar)))
     (fiveam:is (equal (ipaddress:as-string foo) (ipaddress:as-string bar)))
     (fiveam:is (equal (ipaddress:prefix-length foo) (ipaddress:prefix-length bar)))))
